@@ -79,7 +79,8 @@ class LuxDVR_Proto:
 
         return bytearray(struct.pack(
             '< 4s I 4s 8s I 12s I 20s',
-            HEADER, payload_len, opcodes, pad1, struct_len, offset, cam, pad2
+            HEADER, payload_len, opcodes, pad1, struct_len, offset, 2**(cam - 1), pad2
+                                                                      # Chinese magic :)
         ))
 
     def gen_keepalive_req(self):
