@@ -6,6 +6,8 @@ Many older DVRs use a proprietary, undocumented transport protocol that modern N
 
 By piping this clean stream to an RTSP server like MediaMTX, you can easily integrate your old DVR cameras into modern smart home systems (Shinobi, Frigate, Home Assistant) with ~0.1% CPU load.
 
+![In action](demo.png "RSTP proxy in action with LuxDVR Pro 04-fx2")
+
 ### Key Features:
 * 🚀 **Zero Transcoding:** Uses FFmpeg's `-c:v copy` for zero-latency, CPU-free streaming.
 * 🛡️ **Auto-Recovery:** Built-in watchdog handles network drops and broken pipes gracefully.
@@ -44,6 +46,7 @@ The download of `WebClient.exe` should start.
 5. Run Wireshark on interface you use to connect to network with filter `ip.addr == <IP of the DVR>`, press `Enter`
 6. Navigate to `http://<IP of the DVR>/webcamera.html` - you should see a login page. By default, the login is `admin` and the password is `123456`.
 
+![Windows XP VM with legacy web inteface of DVR Pro 04-fx2](xp.png "Windows XP VM with legacy web inteface of DVR Pro 04-fx2")
 ## 3. Protocol
 *(Full reference experimental script is located in `ref.py`)*
 
