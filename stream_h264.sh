@@ -1,0 +1,2 @@
+#!/bin/sh
+/usr/bin/python3 main.py -H 192.168.1.3 -c 1 -m random  | /usr/bin/ffmpeg -hide_banner -loglevel warning -f h264 -i - -vf "setpts=N/(25*TB)" -r 25 -c:v libx264 -preset ultrafast -tune zerolatency -crf 23 -rtsp_transport tcp -f rtsp rtsp://127.0.0.1:8554/cam1

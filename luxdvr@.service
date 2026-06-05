@@ -1,0 +1,24 @@
+[Unit]
+Description=LuxDVR RTSP Streamer - Camera %i
+After=network.target mediamtx.service
+BindsTo=mediamtx.service
+
+[Service]
+Type=simple
+User=<YOUR_USER>
+WorkingDirectory=/YOUR_PATH_TO/luxdvr_reveng
+
+# Without transcoding
+ExecStart=/bin/bash -c "/usr/bin/python3 main.py -c %i --mac random --name 'Camera-%i' | /usr/bin/ffmpeg -hide_banner -loglevel warning -fflags +genpts -use_wallclock_as_timestamps 1 -f h264 -i - -c:v copy -rtsp_transport tcp -f rtsp rtsp://127.0.0.1:8554/cam%i"
+
+# With H.264 transcoding
+# ExecStart=/bin/bash -c "/usr/bin/python3 main.py -c %i --mac random --name 'Camera-%i' | /usr/bin/ffmpeg -hide_banner -loglevel warning -f h264 -i - -vf 'setpts=N/(25*TB)' -r 25 -c:v libx264 -preset ultrafast -tune zerolatency -crf 23 -rtsp_transport tcp -f rtsp rtsp://127.0.0.1:8554/cam%i"
+
+Restart=always
+RestartSec=5
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
