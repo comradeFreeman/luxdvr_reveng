@@ -16,7 +16,7 @@ parser = argparse.ArgumentParser(description="LuxDVR Pro 04-fx2 RTSP Streamer")
 parser.add_argument("-H", "--host", type=str, default=HOST, help="IP address")
 parser.add_argument("-p", "--port", type=int, default=PORT, help="Port")
 parser.add_argument("-c", "--cam", type=int, default=1, help="Camera ID (default: 1)")
-parser.add_argument("-m", "--mac", type=str, help="MAC-address (example: AA:BB:CC:DD:EE:FF), 'random' to generate new, 'real' to use your real MAC")
+parser.add_argument("-m", "--mac", type=str, default="random", help="MAC-address (example: AA:BB:CC:DD:EE:FF), 'random' to generate new (default), 'real' to use your real MAC")
 parser.add_argument("-n", "--name", type=str, help="PC Name / Client ID (example: Viewer-1)")
 args = parser.parse_args()
 
