@@ -20,6 +20,8 @@ By piping this clean stream to an RTSP server like MediaMTX, you can easily inte
 5. `stream_copy.sh` / `stream_h264.sh` — Example shell scripts demonstrating the FFmpeg pipeline. Shows how to repack the raw stream into RTSP with zero-CPU usage (`copy`) or with full software transcoding (`h264`).
 6. `luxdvr@.service` — A `systemd` template unit file for deploying the bridge as a resilient 24/7 background daemon on Linux. It allows managing multiple cameras independently, handles automatic crash recovery, and ensures the correct startup sequence alongside the local RTSP server (e.g., MediaMTX).
 
+### *Built with the help of Google Gemini* 🤖✨
+
 # LuxDVR Pro 04-Fx2 Reverse Engineering
 ### In this part the milestones of reverse engineering of the protocol are provided
 > Main goal was to drop the bunch of Windows XP + Internet Explorer + ActiveX proprietary plugin (known as "WebClient.exe") 
