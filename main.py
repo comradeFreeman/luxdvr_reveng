@@ -27,9 +27,11 @@ def send_keepalive(sock, dvr, interval, stop_event):
         try:
             sock.sendall(dvr.gen_keepalive_req())
         except Exception:
-            # The main stream catches errors of the socket, here we just exit silently
-            break
-
+            # The main stream catches errors of the socket, here we close it
+            try:
+                sock.close()
+            except Exception:
+                pass
 
 def run_stream():
     """Single loop for connection and streaming. In case of the socket failure throws an exception"""
@@ -55,7 +57,7 @@ def run_stream():
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         # Setting timeout during connection
-        s.settimeout(5.0)
+        s.settimeout(1.5)
         print(f"[*] Connecting to the DVR {args.host}:{args.port}...")
         s.connect((args.host, args.port))
 
@@ -89,7 +91,7 @@ def run_stream():
             pass
 
         # Start streaming
-        s.settimeout(None)
+        s.settimeout(25.0)
         s.sendall(dvr.gen_stream_req(args.cam))
         print(f"[!] Request for stream from the camera #{args.cam} sent. Streaming...")
 
@@ -116,33 +118,23 @@ def run_stream():
             stop_keepalive.set()
             ka_thread.join()
 
-
 def main():
-    """Watchdog that monitors the main thread and restarts it"""
-    while True:
-        try:
-            run_stream()
+    """Single run. Any error - die with error-code 1"""
+    try:
+        run_stream()
 
-        except BrokenPipeError:
-            # Arises when receiving program (ffmpeg) was closed
-            print("[!] FFmpeg BrokenPipe. Stopping...")
-            # If ffmpeg crashes we better close too - Systemd will restart full chain
-            sys.exit(0)
+    except BrokenPipeError:
+        print("[!] FFmpeg BrokenPipe. Exiting...")
+        sys.exit(0)
 
-        except (ConnectionError, socket.timeout, socket.error) as e:
-            # Arises when network problems occur, the router/DVR restarts
-            print(f"[!] Network error: {e}. Reconnecting in 5 second...")
-            time.sleep(5)
+    except KeyboardInterrupt:
+        print("[+] Stream stopped by user")
+        sys.exit(0)
 
-        except KeyboardInterrupt:
-            # Ctrl + C
-            print("[+] Stream stopped by user")
-            break
+    except Exception as e:
+        print(f"[-] Fatal stream error: {e}")
+        sys.exit(1)
 
-        except Exception as e:
-            # Other unforeseen errors
-            print(f"[!] Error: {e}. Reconnecting in 5 second...")
-            time.sleep(5)
 
 
 if __name__ == "__main__":
