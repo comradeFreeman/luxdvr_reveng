@@ -57,7 +57,7 @@ def run_stream():
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         # Setting timeout during connection
-        s.settimeout(1.5)
+        s.settimeout(5.0)
         print(f"[*] Connecting to the DVR {args.host}:{args.port}...")
         s.connect((args.host, args.port))
 
@@ -66,7 +66,7 @@ def run_stream():
 
         # Authorisation
         s.sendall(dvr.gen_auth_req())
-        s.settimeout(1.0)
+        s.settimeout(5.0)
         try:
             auth_reply = s.recv(1024)
             info = dvr.parse_dvr_info(auth_reply)

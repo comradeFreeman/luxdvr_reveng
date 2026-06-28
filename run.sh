@@ -2,6 +2,7 @@
 CAM=$1
 PIPE="/tmp/luxdvr_pipe_$CAM"
 NOSIGNAL="/tmp/luxdvr/nosignal_${CAM}.h264"
+sleep $(($1*3))
 
 echo "=== [cam$CAM] Initializing seamless pipeline ==="
 
@@ -24,11 +25,20 @@ exec 3<> "$PIPE"
 
 # 4. Launch the "Eternal" background FFmpeg. It reads the pipe and holds the RTSP connection to MediaMTX.
 # Mode A: Zero transcoding (CPU copy)
-/usr/bin/ffmpeg -hide_banner -loglevel warning -fflags +genpts -use_wallclock_as_timestamps 1 -f h264 -i "$PIPE" -c:v copy -rtsp_transport tcp -f rtsp rtsp://127.0.0.1:8554/cam$CAM &
+/usr/bin/ffmpeg -hide_banner -loglevel error -fflags +genpts -use_wallclock_as_timestamps 1 -f h264 -i "$PIPE" -c:v copy -rtsp_transport tcp -f rtsp rtsp://127.0.0.1:8554/cam$CAM &
 FFMPEG_PID=$!
 
 # Mode B: Software H.264 transcoding (Uncomment if needed)
 # /usr/bin/ffmpeg -hide_banner -loglevel warning -f h264 -i "$PIPE" -vf 'setpts=N/(25*TB)' -r 25 -c:v libx264 -preset ultrafast -tune zerolatency -crf 23 -rtsp_transport tcp -f rtsp rtsp://127.0.0.1:8554/cam$CAM & FFMPEG_PID=$!
+
+(
+    while kill -0 $FFMPEG_PID 2>/dev/null; do
+        sleep 1
+    done
+    echo "=== [cam$CAM] FATAL ERROR: background FFmpeg died! ==="
+    echo "=== [cam$CAM] Restarting unit... ==="
+    kill -TERM $$
+) &
 
 # Graceful cleanup on service termination: kill background FFmpeg and close FD 3
 trap "kill -9 $FFMPEG_PID; exec 3>&-; rm -f $PIPE" EXIT
